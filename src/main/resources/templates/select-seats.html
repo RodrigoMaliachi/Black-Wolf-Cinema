@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <title>Selecciona tus Asientos - Black Wolf Cinema</title>
+    <style>
+        input[type=checkbox]{
+            display: none;
+        }
+
+        .seats-container {
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 20px;
+        }
+
+        .movie-info-bar {
+            background: linear-gradient(90deg, #1A2C50 0%, #2d4a7c 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            box-shadow: 0 4px 12px rgba(26, 44, 80, 0.25);
+        }
+
+        .movie-poster-small {
+            width: 80px;
+            height: 120px;
+            border-radius: 8px;
+            overflow: hidden;
+            background: rgba(255, 255, 255, 0.1);
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .movie-poster-small img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .movie-poster-small-fallback {
+            font-size: 40px;
+            opacity: 0.5;
+        }
+
+        .movie-info-content {
+            flex: 1;
+        }
+
+        .movie-info-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .movie-info-details {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .seats-title {
+            color: #1A2C50;
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .seats-subtitle {
+            color: #666;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 1rem;
+        }
+
+        .screen-container {
+            margin: 40px 0;
+            display: flex;
+            justify-content: center;
+        }
+
+        .screen {
+            border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+            height: 40px;
+            background: linear-gradient(180deg, #1A2C50 0%, #2d4a7c 100%);
+            width: 80%;
+            max-width: 600px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 1.2rem;
+        }
+
+        .seats-grid {
+            margin: 30px 0;
+            display: flex;
+            justify-content: center;
+        }
+
+        .asientos {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            width: fit-content;
+        }
+
+        .asientos ul {
+            display: flex;
+            list-style: none;
+            gap: 8px;
+            justify-content: center;
+        }
+
+        .seat {
+            width: 40px;
+            height: 40px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.75rem;
+            transition: all 0.3s ease;
+        }
+
+        .seat.disponible {
+            background-color: #10b981;
+            color: white;
+            border-color: #059669;
+        }
+
+        .seat.disponible:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        }
+
+        .seat.ocupado {
+            background-color: #6b7280;
+            color: white;
+            border-color: #4b5563;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .seat.apartado {
+            background-color: #f59e0b;
+            color: white;
+            border-color: #d97706;
+        }
+
+        .seat.apartado:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+        }
+
+        .seat.seleccionado {
+            background-color: #1A2C50;
+            color: white;
+            border-color: #0f1f35;
+            box-shadow: 0 0 0 3px rgba(26, 44, 80, 0.3);
+        }
+
+        /* Legend */
+        .legend {
+            background: linear-gradient(90deg, rgba(26, 44, 80, 0.05) 0%, rgba(45, 74, 124, 0.05) 100%);
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 30px 0;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .legend-seat {
+            width: 30px;
+            height: 30px;
+            border: 2px solid;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.7rem;
+            flex-shrink: 0;
+        }
+
+        .legend-seat.disponible {
+            background-color: #3b82f6;
+            border-color: #1e40af;
+            color: white;
+        }
+
+        .legend-seat.ocupado {
+            background-color: #1f2937;
+            border-color: #000;
+            color: white;
+            opacity: 0.7;
+        }
+
+        .legend-seat.seleccionado {
+            background-color: #fbbf24;
+            border-color: #d97706;
+            color: #1a1a1a;
+        }
+
+        .legend-seat-img {
+            width: 40px;
+            height: 40px;
+            object-fit: contain;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+        }
+
+        .legend-text {
+            color: #333;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .action-section {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            align-items: center;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+
+        .seats-info {
+            background: white;
+            padding: 15px 25px;
+            border-radius: 8px;
+            border: 2px solid #1A2C50;
+            color: #1A2C50;
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .btn-continue {
+            background: linear-gradient(90deg, #1A2C50 0%, #2d4a7c 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-family: "Montserrat", sans-serif;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(26, 44, 80, 0.25);
+        }
+
+        .btn-continue:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(26, 44, 80, 0.35);
+        }
+
+        .btn-continue:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        @media (max-width: 768px) {
+            .seats-title {
+                font-size: 1.5rem;
+            }
+
+            .legend {
+                grid-template-columns: 1fr;
+            }
+
+            .action-section {
+                flex-direction: column;
+            }
+
+            .seats-info,
+            .btn-continue {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+<header>
+    <a th:href="@{/}" class="index_link">
+        <img class="logo" th:src="@{/img/blackWolfHorizontal.png}" alt="Black Wolf Cinema Logo">
+    </a>
+    <nav>
+        <ul class="nav_links">
+            <li class="nav_item"><p class="userName">Bienvenido <span sec:authentication="principal.username"></span></p></li>
+            <li>
+                <form action="#" th:action="@{/logout}" method="POST">
+                    <input type="submit" value="Cerrar Sesión" class="cerrar-sesion"/>
+                </form>
+            </li>
+        </ul>
+    </nav>
+</header>
+
+<div class="seats-container">
+    <h1 class="seats-title">🎭 Selecciona tus Asientos</h1>
+    <p class="seats-subtitle">Haz clic en los asientos disponibles para seleccionar</p>
+
+    <!-- Movie Info Bar -->
+    <div class="movie-info-bar" th:object="${show.movie}">
+        <div class="movie-poster-small">
+            <img th:src="@{/assets/{filename}(filename=*{imagePath})}"
+                th:alt="*{name}"
+                class="movie-poster-small-img"
+                onerror="this.style.display='none'; document.querySelector('.movie-poster-small-fallback').style.display='block'"
+            >
+            <div class="movie-poster-small-fallback" style="display: none;">🎬</div>
+        </div>
+        <div class="movie-info-content">
+            <div class="movie-info-title" th:text="*{name}"></div>
+            <div class="movie-info-details">
+                <span th:text="'⏱️ ' + *{duration} + ' min'"></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Screen -->
+    <div class="screen-container">
+        <div class="screen">PANTALLA</div>
+    </div>
+
+    <!-- Seats -->
+    <div class="seats-grid">
+        <div class="asientos" id="seatsContainer">
+        </div>
+    </div>
+
+    <!-- Legend -->
+    <div class="legend">
+        <div class="legend-item">
+            <img src="/img/asiento-tradicional.png" alt="Disponible" class="legend-seat-img">
+            <span class="legend-text">Disponible</span>
+        </div>
+        <div class="legend-item">
+            <img src="/img/asiento-ocupado.png" alt="Ocupado" class="legend-seat-img">
+            <span class="legend-text">Ocupado</span>
+        </div>
+        <div class="legend-item">
+            <img src="/img/asiento-seleccionado.png" alt="Seleccionado" class="legend-seat-img">
+            <span class="legend-text">Seleccionado</span>
+        </div>
+    </div>
+
+    <!-- Form -->
+    <form action="#" th:action="@{/tickets/save}" th:object="${show}" method="POST">
+        <input type="hidden" th:field="*{showId}">
+        <table style="display: none;" id="mytable">
+        </table>
+        
+        <div class="action-section">
+            <div class="seats-info">
+                Asientos seleccionados: <span id="seatCount">0</span>
+            </div>
+            <button type="submit" class="btn-continue" id="continueBtn" disabled>
+                ✓ Continuar a Compra
+            </button>
+        </div>
+    </form>
+</div>
+
+<footer>
+    <p class="footer_text">© Black Wolf Cinema 2025 - Sistema de Gestión de Cines</p>
+</footer>
+
+<script th:inline="javascript">
+    var cinemaRoomId = [[${show.cinemaRoom.cinemaRoomId}]];
+    var showId = [[${show.showId}]];
+</script>
+
+<script th:src="@{/js/selectSeats.js}"></script>
+
+</body>
+</html>

@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agregar/Editar Función - Black Wolf Cinema</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <style>
+        .show-form-container {
+            max-width: 700px;
+            margin: 40px auto;
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .show-form-title {
+            color: #1A2C50;
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #1A2C50;
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            font-family: "Montserrat", sans-serif;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #1A2C50;
+            box-shadow: 0 0 0 3px rgba(26, 44, 80, 0.1);
+        }
+
+        .form-group input:invalid {
+            border-color: #ef4444;
+        }
+
+        .error-list {
+            list-style: none;
+            padding: 0;
+            margin: 8px 0 15px 0;
+        }
+
+        .error-list li {
+            background-color: #fef2f2;
+            color: #991b1b;
+            padding: 10px 12px;
+            border-radius: 6px;
+            border-left: 4px solid #ef4444;
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+        }
+
+        .form-buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 30px;
+            justify-content: center;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-family: "Montserrat", sans-serif;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            border: none;
+            font-size: 0.95rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(90deg, #1A2C50 0%, #2d4a7c 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(26, 44, 80, 0.25);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(26, 44, 80, 0.35);
+        }
+
+        .btn-secondary {
+            background: #6b7280;
+            color: white;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .btn-secondary:hover {
+            background: #4b5563;
+            transform: translateY(-2px);
+        }
+
+        .required::after {
+            content: " *";
+            color: #ef4444;
+            font-weight: 700;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <a th:href="@{/}" class="index_link"><img class="logo" th:src="@{/img/blackWolfHorizontal.png}" alt="Black Wolf Cinema Logo"></a>
+       
+        <nav>
+            <ul class="nav_links">
+                <li class="nav_item"><p class="userName">Bienvenido <span sec:authentication="principal.username"></span></p></li>
+                <li> 
+                    <form action="#" th:action="@{/logout}" method="POST">
+                        <input type="submit" value="Cerrar Sesión" class="cerrar-sesion"/>
+                    </form>
+                </li>
+            </ul>
+        </nav>
+    </header>
+
+    <div class="show-form-container">
+        <h1 class="show-form-title">Agregar Nueva Función</h1>
+        
+        <form action="#" th:action="@{/admin/shows/save}"
+            th:object="${show}" method="POST" novalidate>
+            
+            <input type="hidden" th:field="*{ShowId}">
+
+            <!-- Fecha -->
+            <div class="form-group">
+                <label for="showDate" class="required">Fecha de Función</label>
+                <input type="date" id="showDate" th:field="*{showDate}" required>
+                <ul class="error-list" th:if="${#fields.hasErrors('showDate')}">
+                    <li th:each="err : ${#fields.errors('showDate')}" th:text="'❌ La fecha no puede estar vacía'"></li>
+                </ul>
+            </div>
+
+            <!-- Hora -->
+            <div class="form-group">
+                <label for="showHour" class="required">Hora de Función</label>
+                <input type="time" id="showHour" th:field="*{showHour}" required>
+                <ul class="error-list" th:if="${#fields.hasErrors('showHour')}">
+                    <li th:each="err : ${#fields.errors('showHour')}" th:text="'❌ La hora no puede estar vacía'"></li>
+                </ul>
+            </div>
+
+            <!-- Película -->
+            <div class="form-group">
+                <label for="movies" class="required">Película</label>
+                <select id="movies" name="movies" required>
+                    <option value="">-- Selecciona una película --</option>
+                    <option th:each="tempMovie: ${movies}" 
+                            th:value="${tempMovie.id}" 
+                            th:text="${tempMovie.name}"
+                            th:selected="${show.movie != null and show.movie.id == tempMovie.id}"></option>
+                </select>
+                <ul class="error-list" th:if="${movies.isEmpty()}">
+                    <li>❌ La película no puede estar vacía</li>
+                </ul>
+            </div>
+
+            <!-- Sala de Cine -->
+            <div class="form-group">
+                <label for="cinemaRooms" class="required">Sala de Cine</label>
+                <select id="cinemaRooms" name="cinemaRooms" required>
+                    <option value="">-- Selecciona una sala --</option>
+                    <option th:each="tempCinemaRoom: ${cinemaRooms}" 
+                            th:value="${tempCinemaRoom.cinemaRoomId}" 
+                            th:text="'Sala ' + ${tempCinemaRoom.cinemaRoomId}"
+                            th:selected="${show.cinemaRoom != null and show.cinemaRoom.cinemaRoomId == tempCinemaRoom.cinemaRoomId}"></option>
+                </select>
+                <ul class="error-list" th:if="${cinemaRooms.isEmpty()}">
+                    <li>❌ La sala no puede estar vacía</li>
+                </ul>
+            </div>
+
+            <div class="form-buttons">
+                <a class="btn btn-secondary" th:href="@{/admin/listShows}">← Regresar</a>
+                <button type="submit" class="btn btn-primary">✓ Guardar Función</button>
+            </div>
+        </form>
+    </div>
+
+    <footer>
+        <p class="footer_text">© Black Wolf Cinema 2025 - Sistema de Gestión de Cines</p>
+    </footer>
+
+    <script>
+        // Validación personalizada
+        document.querySelector('form').addEventListener('submit', function(e) {
+            const showDate = document.getElementById('showDate').value;
+            const showHour = document.getElementById('showHour').value;
+            const movies = document.getElementById('movies').value;
+            const cinemaRooms = document.getElementById('cinemaRooms').value;
+
+            let errors = [];
+
+            if (!showDate) {
+                errors.push('La fecha no puede estar vacía');
+            }
+            if (!showHour) {
+                errors.push('La hora no puede estar vacía');
+            }
+            if (!movies) {
+                errors.push('La película no puede estar vacía');
+            }
+            if (!cinemaRooms) {
+                errors.push('La sala no puede estar vacía');
+            }
+
+            if (errors.length > 0) {
+                e.preventDefault();
+                alert('Por favor corrige los siguientes errores:\n\n' + errors.join('\n'));
+            }
+        });
+    </script>
+</body>
+</html>
