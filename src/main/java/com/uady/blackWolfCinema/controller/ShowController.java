@@ -1,9 +1,12 @@
 package com.uady.blackWolfCinema.controller;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -93,9 +96,45 @@ public class ShowController {
 
     // Saves a show (add or update)
     @PostMapping("/admin/shows/save")
-    public String save(@ModelAttribute("show") Show theShow,
+    public String save(@Validated @ModelAttribute("show") Show theShow,
+                       BindingResult bindingResult,
                        @RequestParam("cinemaRooms") int cinemaRoomId,
-                       @RequestParam("movies") int movieId) {
+                       @RequestParam("movies") int movieId,
+                       Model model) {
+        
+        // Validar que la fecha no esté vacía
+        if(theShow.getShowDate() == null) {
+            bindingResult.rejectValue("showDate", "error.showDate", "La fecha de inicio no es válida");
+        }
+        
+        // Validar que la hora no esté vacía
+        if(theShow.getShowHour() == null) {
+            bindingResult.rejectValue("showHour", "error.showHour", "La hora no puede estar vacía");
+        }
+        
+        // Validar que la fecha no sea en el pasado
+        if(theShow.getShowDate() != null && theShow.getShowDate().isBefore(LocalDate.now())) {
+            bindingResult.rejectValue("showDate", "error.showDate", "La fecha no puede ser en el pasado");
+        }
+        
+        // Validar que se haya seleccionado una película
+        if(movieId <= 0) {
+            bindingResult.rejectValue("movie", "error.movie", "La película no puede estar vacía");
+        }
+        
+        // Validar que se haya seleccionado una sala
+        if(cinemaRoomId <= 0) {
+            bindingResult.rejectValue("cinemaRoom", "error.cinemaRoom", "La sala no puede estar vacía");
+        }
+        
+        if(bindingResult.hasErrors()) {
+            List<Movie> movies = movieService.findAll();
+            model.addAttribute("movies", movies);
+            List<CinemaRoom> cinemaRooms = cinemaRoomService.getAllRooms();
+            model.addAttribute("cinemaRooms", cinemaRooms);
+            return "shows/show-form";
+        }
+        
         // Fetch cinema room and movie based on IDs
         CinemaRoom cinemaRoom = cinemaRoomService.findRoomById(cinemaRoomId);
         Movie movie = movieService.findById(movieId);

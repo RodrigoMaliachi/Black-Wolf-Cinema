@@ -2,7 +2,6 @@ package com.uady.blackWolfCinema.model;
 
 import org.springframework.web.multipart.MultipartFile;
 
-import groovyjarjarantlr4.v4.runtime.misc.NotNull;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -12,6 +11,7 @@ import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -29,23 +29,23 @@ public class Movie {
     private int id;
 
     @Column(name = "name")
-    @NotBlank
+    @NotBlank(message = "El nombre de la película no puede estar vacío")
     private String name;
 
     @Column(name = "image_path")
     private String imagePath;
 
     @Column(name = "synopsis")
-    @NotBlank
+    @NotBlank(message = "La sinopsis no puede estar vacía")
     private String synopsis;
 
     @Column(name = "duration_min")
-    @NotNull
-    @Min(value = 1, message = "La duración debe ser mayo que cero")
+    @NotNull(message = "La duración no puede estar vacía")
+    @Min(value = 1, message = "La duración debe ser mayor que cero")
     private int duration;
 
     @Column(name = "trailer")
-    @NotBlank
+    @NotBlank(message = "El trailer no puede estar vacío")
     private String trailer;
 
     @Transient

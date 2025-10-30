@@ -30,6 +30,11 @@ public class UserServiceImpl implements UserService{
 	}
 
 	@Override
+	public boolean existsByEmail(String email) {
+		return userDao.existsByEmail(email);
+	}
+
+	@Override
 	public User findByUserName(String userName) {
 		// check the database if the user already exists
 		return userDao.findByUserName(userName);

@@ -61,9 +61,16 @@ public class MovieController {
 	public String register(@Validated @ModelAttribute("movie") MovieValidation movieValidation,
 		BindingResult bindingResult, HttpSession session, Model theModel) {
 
-		if(bindingResult.hasErrors() || movieValidation.getPortada().isEmpty()) {
+		if(bindingResult.hasErrors()) {
 			return "admin/movie-form";
 		}
+
+		// Validar que la imagen no esté vacía
+		if(movieValidation.getPortada() == null || movieValidation.getPortada().isEmpty()) {
+			bindingResult.rejectValue("portada", "error.portada", "La imagen no puede estar vacía");
+			return "admin/movie-form";
+		}
+
 		movieService.save(movieValidation);
 		session.setAttribute("movie", movieValidation);
 		return "redirect:/admin/listMovies";

@@ -8,6 +8,8 @@ import com.uady.blackWolfCinema.validation.UserValidation;
 
 public interface UserService extends UserDetailsService{
     public User findByUserName(String userName);
+    
+    public boolean existsByEmail(String email);
 
 	void save(UserValidation userValidation);
 }

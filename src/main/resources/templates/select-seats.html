@@ -280,6 +280,29 @@
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         }
 
+        #timerDisplay {
+            transition: color 0.3s;
+        }
+
+        #timerDisplay.warning {
+            color: #fbbf24;
+            animation: pulse 1s infinite;
+        }
+
+        #timerDisplay.danger {
+            color: #ef4444;
+            animation: pulse 0.5s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.6;
+            }
+        }
+
         @media (max-width: 768px) {
             .seats-title {
                 font-size: 1.5rem;
@@ -320,6 +343,12 @@
 <div class="seats-container">
     <h1 class="seats-title">🎭 Selecciona tus Asientos</h1>
     <p class="seats-subtitle">Haz clic en los asientos disponibles para seleccionar</p>
+
+    <!-- Timer de compra -->
+    <div id="timerContainer" style="background: linear-gradient(135deg, #1A2C50 0%, #2d4a7c 100%); color: white; padding: 20px; border-radius: 12px; text-align: center; margin-bottom: 20px; box-shadow: 0 4px 12px rgba(26, 44, 80, 0.25);">
+        <div style="font-size: 0.9rem; opacity: 0.9;">⏱️ Tiempo disponible para completar tu compra:</div>
+        <div id="timerDisplay" style="font-size: 2.5rem; font-weight: 700; margin-top: 10px; font-family: 'Courier New', monospace;">05:00</div>
+    </div>
 
     <!-- Movie Info Bar -->
     <div class="movie-info-bar" th:object="${show.movie}">
@@ -390,6 +419,110 @@
 <script th:inline="javascript">
     var cinemaRoomId = [[${show.cinemaRoom.cinemaRoomId}]];
     var showId = [[${show.showId}]];
+
+    // Timer de 5 minutos (300 segundos)
+    let timerSeconds = 300;
+    const timerDisplay = document.getElementById('timerDisplay');
+    const timerContainer = document.getElementById('timerContainer');
+    
+    function formatTime(seconds) {
+        const mins = Math.floor(seconds / 60);
+        const secs = seconds % 60;
+        return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    }
+
+    function updateTimer() {
+        timerDisplay.textContent = formatTime(timerSeconds);
+        
+        // Cambiar color según el tiempo restante
+        timerDisplay.classList.remove('warning', 'danger');
+        
+        if (timerSeconds <= 60) {
+            timerDisplay.classList.add('danger');
+        } else if (timerSeconds <= 120) {
+            timerDisplay.classList.add('warning');
+        }
+
+        if (timerSeconds > 0) {
+            timerSeconds--;
+            setTimeout(updateTimer, 1000);
+        } else {
+            // Tiempo agotado
+            handleTimeExpired();
+        }
+    }
+
+    function handleTimeExpired() {
+        timerDisplay.textContent = '¡TIEMPO AGOTADO!';
+        timerDisplay.classList.add('danger');
+        
+        // Mostrar modal de tiempo agotado
+        showTimeoutAlert();
+    }
+
+    function showTimeoutAlert() {
+        // Crear modal
+        const modal = document.createElement('div');
+        modal.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        `;
+
+        const alertBox = document.createElement('div');
+        alertBox.style.cssText = `
+            background: white;
+            border-radius: 12px;
+            padding: 40px;
+            max-width: 400px;
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        `;
+
+        alertBox.innerHTML = `
+            <div style="font-size: 3rem; margin-bottom: 20px;">⏰</div>
+            <h2 style="color: #991b1b; margin-bottom: 15px;">¡Tu tiempo se ha agotado!</h2>
+            <p style="color: #666; margin-bottom: 30px; font-size: 1rem;">
+                Tu sesión de compra ha expirado. Los asientos apartados han sido liberados.
+            </p>
+            <button id="returnBtn" style="
+                background: linear-gradient(90deg, #1A2C50 0%, #2d4a7c 100%);
+                color: white;
+                border: none;
+                padding: 12px 30px;
+                border-radius: 6px;
+                font-weight: 600;
+                font-size: 1rem;
+                cursor: pointer;
+                transition: all 0.3s ease;
+            ">
+                Volver a la cartelera
+            </button>
+        `;
+
+        modal.appendChild(alertBox);
+        document.body.appendChild(modal);
+
+        document.getElementById('returnBtn').addEventListener('click', function() {
+            window.location.href = '/';
+        });
+
+        // Deshabilitar formulario y botón
+        document.getElementById('continueBtn').disabled = true;
+        document.getElementById('continueBtn').style.opacity = '0.5';
+    }
+
+    // Iniciar el timer cuando se carga la página
+    document.addEventListener('DOMContentLoaded', function() {
+        updateTimer();
+    });
 </script>
 
 <script th:src="@{/js/selectSeats.js}"></script>

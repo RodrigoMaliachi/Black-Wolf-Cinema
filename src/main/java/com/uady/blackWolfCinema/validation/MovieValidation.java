@@ -2,10 +2,10 @@ package com.uady.blackWolfCinema.validation;
 
 import org.springframework.web.multipart.MultipartFile;
 
-import groovyjarjarantlr4.v4.runtime.misc.NotNull;
 import jakarta.persistence.Transient;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -14,23 +14,23 @@ import lombok.Setter;
 @Setter
 public class MovieValidation {
 
-    @NotBlank (message = "Este campo no puede ir vacio")
+    @NotBlank(message = "El nombre de la película no puede estar vacío")
     private String name;
 
-    @NotBlank(message = "Este campo no puede ir vacio ")
+    @NotBlank(message = "La sinopsis no puede estar vacía")
     private String synopsis;
 
-    @NotNull
-    @Min(value = 1, message = "La duración debe ser mayo que cero")
+    @NotNull(message = "La duración no puede estar vacía")
+    @Min(value = 1, message = "La duración debe ser mayor que cero")
     private int duration;
 
-    @NotBlank(message = "Este campo no puede ir vacio")
+    @NotBlank(message = "El trailer no puede estar vacío")
     private String trailer;
 
     @Transient
     private MultipartFile portada;
-    //no estoy incluyedo la validación de portada y del filePath
-    public MovieValidation(){
+
+    public MovieValidation() {
 
     }
 }

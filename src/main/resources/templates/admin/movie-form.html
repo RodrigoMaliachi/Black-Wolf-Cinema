@@ -1,9 +1,54 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <link rel="stylesheet" th:href="@{/css/addmovie.css}">
     <link rel="stylesheet" th:href="@{/css/style.css}">
-    
+    <style>
+        .error-list {
+            list-style: none;
+            padding: 0;
+            margin: 8px 0;
+        }
+
+        .error-list li {
+            background-color: #fef2f2;
+            color: #991b1b;
+            padding: 10px 12px;
+            border-radius: 6px;
+            border-left: 4px solid #ef4444;
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            border: 1px solid #ddd;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            border-color: #1A2C50;
+            outline: none;
+        }
+
+        .form-group input.error,
+        .form-group textarea.error {
+            border-color: #ef4444;
+            background-color: #fef2f2;
+        }
+    </style>
 </head>
 <body>
     <header>
@@ -22,56 +67,82 @@
         </nav>
     </header>
     <div class="container">
-        <form action="#" th:action="@{/admin/processRegistrationForm}" class="form-movie" method="POST" th:object="${movie}" enctype="multipart/form-data" >
-        <div>
-            <label for="name">Titulo : </label> <input
-                type="text" id="name" placeholder="Escriba el titulo" th:field="*{name}">
-        </div>
-        <div th:if="${#fields.hasErrors('name')}">
-            <ul>
-                 <li class="error" th:each="err : ${#fields.errors('name')}" th:text="${err}" />
+        <form action="#" th:action="@{/admin/processRegistrationForm}" class="form-movie" method="POST" th:object="${movie}" enctype="multipart/form-data" novalidate>
+        
+        <!-- Título -->
+        <div class="form-group">
+            <label for="name">Título : </label> 
+            <input type="text" id="name" placeholder="Escriba el titulo" th:field="*{name}" th:classappend="${#fields.hasErrors('name') ? 'error' : ''}">
+            <ul class="error-list" th:if="${#fields.hasErrors('name')}">
+                <li th:each="err : ${#fields.errors('name')}" th:text="'❌ ' + ${err}"></li>
             </ul>
         </div>
-        <div >
+
+        <!-- Sinopsis -->
+        <div class="form-group">
             <label for="synopsis" class="form-label">Sinopsis : </label>
-            <textarea id="synopsis" placeholder="Escriba la sinopsis" th:field="*{synopsis}"></textarea>
-        </div>
-        <div th:if="${#fields.hasErrors('synopsis')}">
-            <ul>
-                 <li class="error" th:each="err : ${#fields.errors('synopsis')}" th:text="${err}" />
+            <textarea id="synopsis" placeholder="Escriba la sinopsis" th:field="*{synopsis}" th:classappend="${#fields.hasErrors('synopsis') ? 'error' : ''}"></textarea>
+            <ul class="error-list" th:if="${#fields.hasErrors('synopsis')}">
+                <li th:each="err : ${#fields.errors('synopsis')}" th:text="'❌ ' + ${err}"></li>
             </ul>
         </div>
-        <div >
-            <label for="time" class="form-label">Duración : </label>
-            <input type="number" id="time" placeholder="Escriba la duración" th:field="*{duration}"></input>
-        </div>
-        <div th:if="${#fields.hasErrors('duration')}">
-            <ul>
-                 <li class="error" th:each="err : ${#fields.errors('duration')}" th:text="${err}" />
+
+        <!-- Duración -->
+        <div class="form-group">
+            <label for="time" class="form-label">Duración (minutos) : </label>
+            <input type="number" id="time" placeholder="Escriba la duración" th:field="*{duration}" th:classappend="${#fields.hasErrors('duration') ? 'error' : ''}"></input>
+            <ul class="error-list" th:if="${#fields.hasErrors('duration')}">
+                <li th:each="err : ${#fields.errors('duration')}" th:text="'❌ ' + ${err}"></li>
             </ul>
         </div>
-        <div>
-            <label for="trailer">Trailer : </label> 
-            <input type="text" id="trailer" placeholder="Digite el trailer" th:field="*{trailer}">
-        </div>
-        <div th:if="${#fields.hasErrors('trailer')}">
-            <ul>
-                 <li class="error" th:each="err : ${#fields.errors('trailer')}" th:text="${err}" />
+
+        <!-- Trailer -->
+        <div class="form-group">
+            <label for="trailer">URL del Trailer : </label> 
+            <input type="text" id="trailer" placeholder="Digite la URL del trailer" th:field="*{trailer}" th:classappend="${#fields.hasErrors('trailer') ? 'error' : ''}">
+            <ul class="error-list" th:if="${#fields.hasErrors('trailer')}">
+                <li th:each="err : ${#fields.errors('trailer')}" th:text="'❌ ' + ${err}"></li>
             </ul>
         </div>
-        <div>
-            <label for="portada">Portada : </label> 
-            <input type="file" name="portada" id="portada" th:field="*{portada}">
+
+        <!-- Imagen/Portada -->
+        <div class="form-group">
+            <label for="portada">Portada (Imagen) : </label> 
+            <input type="file" name="portada" id="portada" th:field="*{portada}" accept="image/*">
+            <ul class="error-list" th:if="${#fields.hasErrors('portada')}">
+                <li th:each="err : ${#fields.errors('portada')}" th:text="'❌ ' + ${err}"></li>
+            </ul>
         </div>
+
         <button type="submit" class="btn btn-primary">Guardar</button>
 
     
-    </form>
+        </form>
     </div>
     <footer>
         <p class="footer_text">Black Wolf Cinema ®</p>
     </footer>
 
+    <script>
+        // Validación en tiempo real
+        document.querySelector('form').addEventListener('submit', function(e) {
+            const portada = document.getElementById('portada');
+            
+            // Validar que la portada no esté vacía
+            if (!portada.files || portada.files.length === 0) {
+                e.preventDefault();
+                alert('❌ La imagen no puede estar vacía');
+                return;
+            }
 
+            // Validar que sea una imagen
+            const file = portada.files[0];
+            if (!file.type.startsWith('image/')) {
+                e.preventDefault();
+                alert('❌ El archivo debe ser una imagen');
+                return;
+            }
+        });
+    </script>
 </body>
 </html>

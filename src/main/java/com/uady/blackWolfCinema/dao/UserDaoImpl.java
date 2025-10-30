@@ -20,6 +20,18 @@ public class UserDaoImpl implements UserDao{
 	}
 
 	@Override
+	public boolean existsByEmail(String email) {
+		try {
+			TypedQuery<User> theQuery = entityManager.createQuery("from User where email=:email", User.class);
+			theQuery.setParameter("email", email);
+			theQuery.getSingleResult();
+			return true;
+		} catch (Exception e) {
+			return false;
+		}
+	}
+
+	@Override
 	public User findByUserName(String theUserName) {
 
 		// retrieve/read from database using username

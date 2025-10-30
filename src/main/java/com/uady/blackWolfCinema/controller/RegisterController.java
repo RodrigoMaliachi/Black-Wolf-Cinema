@@ -77,7 +77,7 @@ public class RegisterController {
         User existing = userService.findByUserName(userName);
         if (existing != null){
         	theModel.addAttribute("newUser", new UserValidation());
-			theModel.addAttribute("registrationError", "User name already exists.");
+			theModel.addAttribute("registrationError", "El nombre de usuario ya está registrado");
 
 			logger.warning("User name already exists.");
         	return "register/signup";

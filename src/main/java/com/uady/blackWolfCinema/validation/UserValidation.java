@@ -1,30 +1,29 @@
 package com.uady.blackWolfCinema.validation;
 
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 public class UserValidation {
 
-	@NotNull(message = "es requerido")
-	@Size(min = 4, message = "no es valido")
+	@NotBlank(message = "El nombre de usuario no puede estar vacío")
+	@Size(min = 4, message = "El nombre de usuario debe tener al menos 4 caracteres")
 	private String userName;
 
-	@NotNull(message = "es requerido")
-	@Size(min = 4, message = "no es valido")
+	@ValidPassword
 	private String password;
 
-	@NotNull(message = "es requerido")
-	@Size(min = 4, message = "no es valido")
+	@NotBlank(message = "El nombre no puede estar vacío")
+	@ValidNames
 	private String firstName;
 
-	@NotNull(message = "es requerido")
-	@Size(min = 4, message = "no es valido")
+	@NotBlank(message = "El apellido no puede estar vacío")
+	@ValidNames
 	private String lastName;
 
-	@NotNull(message = "es requerido")
-	@Size(min = 4, message = "no es valido")
-	@Pattern(regexp="^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$", message = "no es válido")
+	@NotBlank(message = "El correo electrónico no puede estar vacío")
+	@Pattern(regexp="^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$", message = "El correo electrónico no es válido")
+	@UniqueEmail
 	private String email;
 
 	public UserValidation() {

@@ -44,6 +44,7 @@
             font-family: "Montserrat", sans-serif;
             font-size: 0.95rem;
             transition: all 0.3s ease;
+            box-sizing: border-box;
         }
 
         .form-group input:focus,
@@ -55,6 +56,12 @@
 
         .form-group input:invalid {
             border-color: #ef4444;
+        }
+
+        .form-group input.error,
+        .form-group select.error {
+            border-color: #ef4444;
+            background-color: #fef2f2;
         }
 
         .error-list {
@@ -104,6 +111,12 @@
             box-shadow: 0 6px 20px rgba(26, 44, 80, 0.35);
         }
 
+        .btn-primary:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+            transform: none;
+        }
+
         .btn-secondary {
             background: #6b7280;
             color: white;
@@ -119,6 +132,20 @@
             content: " *";
             color: #ef4444;
             font-weight: 700;
+        }
+
+        .alert {
+            background-color: #fef2f2;
+            border: 1px solid #fca5a5;
+            color: #991b1b;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .alert.show {
+            display: block;
         }
     </style>
 </head>
@@ -141,17 +168,19 @@
     <div class="show-form-container">
         <h1 class="show-form-title">Agregar Nueva Función</h1>
         
+        <div id="alertBox" class="alert"></div>
+        
         <form action="#" th:action="@{/admin/shows/save}"
-            th:object="${show}" method="POST" novalidate>
+            th:object="${show}" method="POST" novalidate id="showForm">
             
-            <input type="hidden" th:field="*{ShowId}">
+            <input type="hidden" th:field="*{showId}">
 
             <!-- Fecha -->
             <div class="form-group">
                 <label for="showDate" class="required">Fecha de Función</label>
                 <input type="date" id="showDate" th:field="*{showDate}" required>
                 <ul class="error-list" th:if="${#fields.hasErrors('showDate')}">
-                    <li th:each="err : ${#fields.errors('showDate')}" th:text="'❌ La fecha no puede estar vacía'"></li>
+                    <li th:each="err : ${#fields.errors('showDate')}" th:text="'❌ ' + ${err}"></li>
                 </ul>
             </div>
 
@@ -160,7 +189,7 @@
                 <label for="showHour" class="required">Hora de Función</label>
                 <input type="time" id="showHour" th:field="*{showHour}" required>
                 <ul class="error-list" th:if="${#fields.hasErrors('showHour')}">
-                    <li th:each="err : ${#fields.errors('showHour')}" th:text="'❌ La hora no puede estar vacía'"></li>
+                    <li th:each="err : ${#fields.errors('showHour')}" th:text="'❌ ' + ${err}"></li>
                 </ul>
             </div>
 
@@ -196,7 +225,7 @@
 
             <div class="form-buttons">
                 <a class="btn btn-secondary" th:href="@{/admin/listShows}">← Regresar</a>
-                <button type="submit" class="btn btn-primary">✓ Guardar Función</button>
+                <button type="submit" class="btn btn-primary" id="submitBtn">✓ Guardar Función</button>
             </div>
         </form>
     </div>
@@ -206,33 +235,87 @@
     </footer>
 
     <script>
-        // Validación personalizada
-        document.querySelector('form').addEventListener('submit', function(e) {
-            const showDate = document.getElementById('showDate').value;
-            const showHour = document.getElementById('showHour').value;
-            const movies = document.getElementById('movies').value;
-            const cinemaRooms = document.getElementById('cinemaRooms').value;
+        const form = document.getElementById('showForm');
+        const showDateInput = document.getElementById('showDate');
+        const showHourInput = document.getElementById('showHour');
+        const moviesSelect = document.getElementById('movies');
+        const cinemaRoomsSelect = document.getElementById('cinemaRooms');
+        const alertBox = document.getElementById('alertBox');
+        const submitBtn = document.getElementById('submitBtn');
+
+        // Validación en tiempo real de la fecha
+        if (showDateInput) {
+            showDateInput.addEventListener('change', function() {
+                const selectedDate = new Date(this.value);
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+
+                if (selectedDate < today) {
+                    this.classList.add('error');
+                    showError('La fecha no puede ser en el pasado');
+                } else {
+                    this.classList.remove('error');
+                    clearError();
+                }
+            });
+
+            // Set minimum date to today
+            const today = new Date().toISOString().split('T')[0];
+            showDateInput.setAttribute('min', today);
+        }
+
+        // Validación al enviar el formulario
+        form.addEventListener('submit', function(e) {
+            const showDate = showDateInput.value;
+            const showHour = showHourInput.value;
+            const movies = moviesSelect.value;
+            const cinemaRooms = cinemaRoomsSelect.value;
 
             let errors = [];
 
             if (!showDate) {
                 errors.push('La fecha no puede estar vacía');
+                showDateInput.classList.add('error');
+            } else {
+                showDateInput.classList.remove('error');
             }
+
             if (!showHour) {
                 errors.push('La hora no puede estar vacía');
+                showHourInput.classList.add('error');
+            } else {
+                showHourInput.classList.remove('error');
             }
+
             if (!movies) {
                 errors.push('La película no puede estar vacía');
+                moviesSelect.classList.add('error');
+            } else {
+                moviesSelect.classList.remove('error');
             }
+
             if (!cinemaRooms) {
                 errors.push('La sala no puede estar vacía');
+                cinemaRoomsSelect.classList.add('error');
+            } else {
+                cinemaRoomsSelect.classList.remove('error');
             }
 
             if (errors.length > 0) {
                 e.preventDefault();
-                alert('Por favor corrige los siguientes errores:\n\n' + errors.join('\n'));
+                showError(errors.join('\n'));
             }
         });
+
+        function showError(message) {
+            alertBox.textContent = '❌ Error: ' + message;
+            alertBox.classList.add('show');
+        }
+
+        function clearError() {
+            alertBox.textContent = '';
+            alertBox.classList.remove('show');
+        }
     </script>
 </body>
 </html>

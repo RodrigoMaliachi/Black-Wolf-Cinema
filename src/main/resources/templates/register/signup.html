@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,6 +8,95 @@
         <meta name="author" content="">
         <title>Crear Cuenta</title>
         <link rel="stylesheet" th:href="@{/css/style.css}">
+        <style>
+            .alert {
+                padding: 15px;
+                margin-bottom: 20px;
+                border-radius: 8px;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                font-weight: 600;
+            }
+
+            .alert-error {
+                background-color: #fef2f2;
+                border: 1px solid #fca5a5;
+                color: #991b1b;
+            }
+
+            .error-list {
+                list-style: none;
+                padding: 0;
+                margin: 8px 0;
+            }
+
+            .error-list li {
+                background-color: #fef2f2;
+                color: #991b1b;
+                padding: 10px 12px;
+                border-radius: 6px;
+                border-left: 4px solid #ef4444;
+                margin-bottom: 5px;
+                font-size: 0.9rem;
+            }
+
+            .form-group-wrapper {
+                margin-bottom: 20px;
+            }
+
+            .form-group-wrapper input {
+                border-color: #e0e0e0;
+                transition: border-color 0.3s;
+            }
+
+            .form-group-wrapper input:focus {
+                border-color: #1A2C50;
+                box-shadow: 0 0 0 3px rgba(26, 44, 80, 0.1);
+            }
+
+            .form-group-wrapper input.error {
+                border-color: #ef4444;
+            }
+
+            .password-requirements {
+                background: #f0f9ff;
+                border: 1px solid #bfdbfe;
+                border-radius: 6px;
+                padding: 12px;
+                margin-top: 8px;
+                font-size: 0.85rem;
+                color: #1e40af;
+            }
+
+            .requirement {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                margin: 4px 0;
+            }
+
+            .requirement-check {
+                width: 16px;
+                height: 16px;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 0.7rem;
+                font-weight: 700;
+            }
+
+            .requirement.met .requirement-check {
+                background: #10b981;
+                color: white;
+            }
+
+            .requirement.unmet .requirement-check {
+                background: #ef4444;
+                color: white;
+            }
+        </style>
     </head>
     <body>
         <header>
@@ -17,7 +106,7 @@
         <div class="container">
             <form action="#" th:action="@{/register/processRegistrationForm}"
             th:object="${newUser}"
-            method="POST" class="signup_form" id="formulario">
+            method="POST" class="signup_form" id="formulario" novalidate>
                 <h1>Crea tu cuenta</h1><br>
                 
                 <!-- Mostrar error de usuario duplicado -->
@@ -25,60 +114,68 @@
                     <strong>❌ Error:</strong> <span th:text="${registrationError}"></span>
                 </div>
                 
-                <div>
+                <!-- Nombre de Usuario -->
+                <div class="form-group-wrapper">
                     <h4>Nombre de Usuario</h4>
-                    <input type="text" th:field="*{userName}"/>
-                </div>
-                <div th:if="${#fields.hasErrors('userName')}">
-                    <ul>
-                         <li class="error" th:each="err : ${#fields.errors('userName')}" th:text="'El nombre de usuario ' + ${err}" />
+                    <input type="text" th:field="*{userName}" placeholder="Mínimo 4 caracteres"/>
+                    <ul class="error-list" th:if="${#fields.hasErrors('userName')}">
+                        <li th:each="err : ${#fields.errors('userName')}" th:text="'❌ ' + ${err}"></li>
                     </ul>
                 </div>
-                <!--field name -->
-                <div>
+
+                <!-- Nombre -->
+                <div class="form-group-wrapper">
                     <h4>Nombre</h4>
-                    <input type="text" th:field="*{firstName}" />
-
-                </div>
-                <div th:if="${#fields.hasErrors('firstName')}">
-                    <ul>
-                        <li class="error" th:each="err : ${#fields.errors('firstName')}" th:text="'El nombre ' + ${err}" />
+                    <input type="text" th:field="*{firstName}" placeholder="Solo letras" />
+                    <ul class="error-list" th:if="${#fields.hasErrors('firstName')}">
+                        <li th:each="err : ${#fields.errors('firstName')}" th:text="'❌ ' + ${err}"></li>
                     </ul>
                 </div>
 
-                <!--field lastname-->
-                <div>
+                <!-- Apellido -->
+                <div class="form-group-wrapper">
                     <h4>Apellido</h4>
-                    <input type="text" th:field="*{lastName}"/>
-                </div>
-                <div th:if="${#fields.hasErrors('lastName')}">
-                    <ul>
-                        <li class="error" th:each="err : ${#fields.errors('lastName')}" th:text="'El apellido ' + ${err}" />
+                    <input type="text" th:field="*{lastName}" placeholder="Solo letras"/>
+                    <ul class="error-list" th:if="${#fields.hasErrors('lastName')}">
+                        <li th:each="err : ${#fields.errors('lastName')}" th:text="'❌ ' + ${err}"></li>
                     </ul>
                 </div>
 
-                <!--field email-->
-                <div>
+                <!-- Email -->
+                <div class="form-group-wrapper">
                     <h4>Email</h4>
-                    <input type="text" th:field="*{email}"/>
-                </div>
-                <div th:if="${#fields.hasErrors('email')}">
-                    <ul>
-                        <li class="error" th:each="err : ${#fields.errors('email')}" th:text="'El email ' + ${err}" />
+                    <input type="email" th:field="*{email}" placeholder="ejemplo@correo.com"/>
+                    <ul class="error-list" th:if="${#fields.hasErrors('email')}">
+                        <li th:each="err : ${#fields.errors('email')}" th:text="'❌ ' + ${err}"></li>
                     </ul>
                 </div>
 
-                <!--field password-->
-                <div>
+                <!-- Contraseña -->
+                <div class="form-group-wrapper">
                     <h4>Contraseña</h4>
-                    <input type="password" th:field="*{password}" />
-                </div>
-                <div th:if="${#fields.hasErrors('password')}">
-                    <ul>
-                        <li class="error" th:each="err : ${#fields.errors('password')}" th:text="'La contraseña ' + ${err}" />
+                    <input type="password" th:field="*{password}" id="passwordInput" placeholder="Mínimo 8 caracteres con letras y números" />
+                    <ul class="error-list" th:if="${#fields.hasErrors('password')}">
+                        <li th:each="err : ${#fields.errors('password')}" th:text="'❌ ' + ${err}"></li>
                     </ul>
+                    
+                    <!-- Requisitos de contraseña -->
+                    <div class="password-requirements" id="passwordRequirements" style="display: none;">
+                        <div class="requirement unmet" id="req-length">
+                            <span class="requirement-check">✓</span>
+                            <span>Al menos 8 caracteres</span>
+                        </div>
+                        <div class="requirement unmet" id="req-letters">
+                            <span class="requirement-check">✓</span>
+                            <span>Contiene letras</span>
+                        </div>
+                        <div class="requirement unmet" id="req-numbers">
+                            <span class="requirement-check">✓</span>
+                            <span>Contiene números</span>
+                        </div>
+                    </div>
                 </div>
-                <button type="submit" class="btn-registrar">Registrar</button>
+
+                <button type="submit" class="btn-registrar" id="submitBtn">Registrar</button>
                 
             </form>
         </div>
@@ -87,4 +184,76 @@
         </footer>
     </body>
     <script src="js/app.js"></script>
+    <script>
+        // Validación de contraseña en tiempo real
+        const passwordInput = document.getElementById('passwordInput');
+        const passwordRequirements = document.getElementById('passwordRequirements');
+        const reqLength = document.getElementById('req-length');
+        const reqLetters = document.getElementById('req-letters');
+        const reqNumbers = document.getElementById('req-numbers');
+        const submitBtn = document.getElementById('submitBtn');
+
+        if (passwordInput) {
+            passwordInput.addEventListener('focus', function() {
+                passwordRequirements.style.display = 'block';
+            });
+
+            passwordInput.addEventListener('input', function() {
+                const password = this.value;
+                let allMet = true;
+
+                // Validar longitud
+                if (password.length >= 8) {
+                    reqLength.classList.remove('unmet');
+                    reqLength.classList.add('met');
+                } else {
+                    reqLength.classList.remove('met');
+                    reqLength.classList.add('unmet');
+                    allMet = false;
+                }
+
+                // Validar letras
+                if (/[a-zA-Z]/.test(password)) {
+                    reqLetters.classList.remove('unmet');
+                    reqLetters.classList.add('met');
+                } else {
+                    reqLetters.classList.remove('met');
+                    reqLetters.classList.add('unmet');
+                    allMet = false;
+                }
+
+                // Validar números
+                if (/[0-9]/.test(password)) {
+                    reqNumbers.classList.remove('unmet');
+                    reqNumbers.classList.add('met');
+                } else {
+                    reqNumbers.classList.remove('met');
+                    reqNumbers.classList.add('unmet');
+                    allMet = false;
+                }
+
+                // Habilitar/deshabilitar botón
+                submitBtn.disabled = !allMet;
+            });
+        }
+
+        // Validación al enviar el formulario
+        document.getElementById('formulario').addEventListener('submit', function(e) {
+            const firstName = document.querySelector('input[name="firstName"]').value.trim();
+            const lastName = document.querySelector('input[name="lastName"]').value.trim();
+            
+            // Validar que nombres solo contengan letras
+            if (!/^[a-záéíóúñA-ZÁÉÍÓÚÑ\s]*$/.test(firstName) || firstName === '') {
+                e.preventDefault();
+                alert('El nombre solo debe contener caracteres alfabéticos');
+                return;
+            }
+            
+            if (!/^[a-záéíóúñA-ZÁÉÍÓÚÑ\s]*$/.test(lastName) || lastName === '') {
+                e.preventDefault();
+                alert('El apellido solo debe contener caracteres alfabéticos');
+                return;
+            }
+        });
+    </script>
 </html>
