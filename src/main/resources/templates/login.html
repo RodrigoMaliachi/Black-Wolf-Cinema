@@ -150,11 +150,11 @@
                 <p class="subtitle">Accede a tu cuenta para continuar</p>
 
                 <div th:if="${param.error}" class="error-alert">
-                    ❌ Usuario o contraseña incorrecto
+                    Usuario o contraseña incorrecto
                 </div>
 
                 <div th:if="${param.logout}" class="success-alert">
-                    ✓ Sesión cerrada correctamente
+                    Sesión cerrada correctamente
                 </div>
 
                 <form th:action="@{/authenticateTheUser}" method="POST">

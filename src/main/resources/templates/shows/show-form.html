@@ -180,7 +180,7 @@
                 <label for="showDate" class="required">Fecha de Función</label>
                 <input type="date" id="showDate" th:field="*{showDate}" required>
                 <ul class="error-list" th:if="${#fields.hasErrors('showDate')}">
-                    <li th:each="err : ${#fields.errors('showDate')}" th:text="'❌ ' + ${err}"></li>
+                    <li th:each="err : ${#fields.errors('showDate')}" th:text="${err}"></li>
                 </ul>
             </div>
 
@@ -189,7 +189,7 @@
                 <label for="showHour" class="required">Hora de Función</label>
                 <input type="time" id="showHour" th:field="*{showHour}" required>
                 <ul class="error-list" th:if="${#fields.hasErrors('showHour')}">
-                    <li th:each="err : ${#fields.errors('showHour')}" th:text="'❌ ' + ${err}"></li>
+                    <li th:each="err : ${#fields.errors('showHour')}" th:text="${err}"></li>
                 </ul>
             </div>
 
@@ -204,7 +204,7 @@
                             th:selected="${show.movie != null and show.movie.id == tempMovie.id}"></option>
                 </select>
                 <ul class="error-list" th:if="${movies.isEmpty()}">
-                    <li>❌ La película no puede estar vacía</li>
+                    <li>La película no puede estar vacía</li>
                 </ul>
             </div>
 
@@ -219,13 +219,13 @@
                             th:selected="${show.cinemaRoom != null and show.cinemaRoom.cinemaRoomId == tempCinemaRoom.cinemaRoomId}"></option>
                 </select>
                 <ul class="error-list" th:if="${cinemaRooms.isEmpty()}">
-                    <li>❌ La sala no puede estar vacía</li>
+                    <li>La sala no puede estar vacía</li>
                 </ul>
             </div>
 
             <div class="form-buttons">
-                <a class="btn btn-secondary" th:href="@{/admin/listShows}">← Regresar</a>
-                <button type="submit" class="btn btn-primary" id="submitBtn">✓ Guardar Función</button>
+                <a class="btn btn-secondary" th:href="@{/admin/listShows}">Regresar</a>
+                <button type="submit" class="btn btn-primary" id="submitBtn">Guardar Función</button>
             </div>
         </form>
     </div>

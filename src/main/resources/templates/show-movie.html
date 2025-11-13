@@ -209,7 +209,6 @@
         }
 
         .showtimes-title::before {
-            content: '🎬';
             font-size: 2rem;
         }
 
@@ -347,7 +346,7 @@
 
     <div class="movie-hero">
         <div class="movie-detail-container">
-            <a th:href="@{/}" class="back-button">← Volver a la Cartelera</a>
+            <a th:href="@{/}" class="back-button">Volver a la Cartelera</a>
         </div>
     </div>
 
@@ -360,7 +359,7 @@
                     class="movie-poster-img"
                     onerror="this.style.display='none'; document.querySelector('.movie-poster-fallback').style.display='block'"
                 >
-                <div class="movie-poster-fallback" style="display: none;">🎬</div>
+                <div class="movie-poster-fallback" style="display: none;"></div>
             </div>
 
             <!-- Info -->
@@ -371,14 +370,14 @@
 
                 <div class="movie-meta">
                     <div class="meta-item">
-                        <span class="meta-label">⏱️ Duración</span>
+                        <span class="meta-label">Duración</span>
                         <span class="meta-value" th:text="*{duration} + ' minutos'"></span>
                     </div>
                 </div>
 
                 <!-- Trailer Section -->
                 <div class="trailer-section" th:if="*{trailer} != null and *{trailer} != ''">
-                    <h3 class="trailer-title">🎥 Ver Tráiler</h3>
+                    <h3 class="trailer-title">Ver Tráiler</h3>
                     <a th:href="*{trailer}" target="_blank" class="trailer-button">
                         ▶ Reproducir Tráiler
                     </a>
@@ -392,7 +391,7 @@
             <div class="showtimes-grid">
                 <div class="showtime-card" th:each="show : ${shows}" th:object="${show}">
                     <div class="showtime-date" th:text="*{showDate}"></div>
-                    <a class="showtime-hour-link" th:href="@{/seats/{showId}(showId=*{showId})}" th:text="'🎫 Comprar para ' + *{showHour}"></a>
+                    <a class="showtime-hour-link" th:href="@{/seats/{showId}(showId=*{showId})}" th:text="'Comprar para ' + *{showHour}"></a>
                 </div>
             </div>
         </div>

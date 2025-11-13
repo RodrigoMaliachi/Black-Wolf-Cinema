@@ -253,7 +253,7 @@
 
     <div class="movie-hero">
         <div class="movie-detail-container">
-            <a th:href="@{/}" class="back-button">← Volver a la Cartelera</a>
+            <a th:href="@{/}" class="back-button">Volver a la Cartelera</a>
         </div>
     </div>
 
@@ -265,7 +265,7 @@
                     th:alt="*{name}"
                     onerror="this.style.display='none'; document.querySelector('.movie-poster-fallback').style.display='block'"
                 >
-                <div class="movie-poster-fallback" style="display: none;">🎬</div>
+                <div class="movie-poster-fallback" style="display: none;"></div>
             </div>
 
             <!-- Info -->
@@ -276,7 +276,7 @@
 
                 <div class="movie-meta">
                     <div class="meta-item">
-                        <span class="meta-label">⏱️ Duración</span>
+                        <span class="meta-label">Duración</span>
                         <span class="meta-value" th:text="*{duration} + ' minutos'"></span>
                     </div>
                 </div>
@@ -290,7 +290,7 @@
                         ▶ Ver Tráiler
                     </a>
                     <a th:href="@{/show/{id}(id=*{id})}" class="btn-tickets">
-                        🎫 Comprar Boletos
+                        Comprar Boletos
                     </a>
                 </div>
             </div>

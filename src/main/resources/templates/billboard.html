@@ -317,16 +317,16 @@
                 </button>
                 <nav id="nav-admin" class="role-container">
                     <ul>
-                        <li><a th:href="@{/admin/listMovies}">📽️ Panel de Películas</a></li>
-                        <li><a th:href="@{/admin/listShows}">🎬 Panel de Funciones</a></li>
-                        <li><a th:href="@{/admin/receipt}">📊 Reporte</a></li>
-                        <li><button class="cerrar-menu">✕ Cerrar</button></li>
+                        <li><a th:href="@{/admin/listMovies}">Panel de Películas</a></li>
+                        <li><a th:href="@{/admin/listShows}">Panel de Funciones</a></li>
+                        <li><a th:href="@{/admin/receipt}">Reporte</a></li>
+                        <li><button class="cerrar-menu">Cerrar</button></li>
                     </ul>
                 </nav>
             </div>
 
             <!-- Cartelera Título -->
-            <h1 class="billboard-title">🎬 Cartelera de Películas</h1>
+            <h1 class="billboard-title">Cartelera de Películas</h1>
 
             <!-- Movies Container -->
             <div class="movie-container">
@@ -338,10 +338,10 @@
                             onerror="this.classList.add('no-image')"
                         >
                         <div class="movie-image-fallback" th:if="${movie.imagePath == null or movie.imagePath == ''}">
-                            🎬
+                            
                         </div>
                         <div class="movie-image-fallback" style="display: none;" id="fallback-icon">
-                            🎬
+                            
                         </div>
                     </div>
                     <div class="movie-info">

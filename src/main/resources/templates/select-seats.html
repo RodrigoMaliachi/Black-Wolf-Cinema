@@ -341,12 +341,12 @@
 </header>
 
 <div class="seats-container">
-    <h1 class="seats-title">🎭 Selecciona tus Asientos</h1>
+    <h1 class="seats-title">Selecciona tus Asientos</h1>
     <p class="seats-subtitle">Haz clic en los asientos disponibles para seleccionar</p>
 
     <!-- Timer de compra -->
     <div id="timerContainer" style="background: linear-gradient(135deg, #1A2C50 0%, #2d4a7c 100%); color: white; padding: 20px; border-radius: 12px; text-align: center; margin-bottom: 20px; box-shadow: 0 4px 12px rgba(26, 44, 80, 0.25);">
-        <div style="font-size: 0.9rem; opacity: 0.9;">⏱️ Tiempo disponible para completar tu compra:</div>
+        <div style="font-size: 0.9rem; opacity: 0.9;">Tiempo disponible para completar tu compra:</div>
         <div id="timerDisplay" style="font-size: 2.5rem; font-weight: 700; margin-top: 10px; font-family: 'Courier New', monospace;">05:00</div>
     </div>
 
@@ -358,12 +358,12 @@
                 class="movie-poster-small-img"
                 onerror="this.style.display='none'; document.querySelector('.movie-poster-small-fallback').style.display='block'"
             >
-            <div class="movie-poster-small-fallback" style="display: none;">🎬</div>
+            <div class="movie-poster-small-fallback" style="display: none;"></div>
         </div>
         <div class="movie-info-content">
             <div class="movie-info-title" th:text="*{name}"></div>
             <div class="movie-info-details">
-                <span th:text="'⏱️ ' + *{duration} + ' min'"></span>
+                <span th:text="*{duration} + ' min'"></span>
             </div>
         </div>
     </div>
@@ -406,7 +406,7 @@
                 Asientos seleccionados: <span id="seatCount">0</span>
             </div>
             <button type="submit" class="btn-continue" id="continueBtn" disabled>
-                ✓ Continuar a Compra
+                Continuar a Compra
             </button>
         </div>
     </form>
