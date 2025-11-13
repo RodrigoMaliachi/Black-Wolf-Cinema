@@ -1,132 +1,370 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <meta name="description" content="">
-        <meta name="author" content="">
-        <title>Cartelera</title>
+        <title>Panel de Películas - Black Wolf Cinema</title>
         <link rel="stylesheet" th:href="@{/css/style.css}">
+        <style>
+            * { box-sizing: border-box; }
+
+            html, body {
+                height: 100%;
+                margin: 0;
+                overflow: hidden;
+            }
+
+            body {
+                display: flex;
+                flex-direction: column;
+            }
+
+            header {
+                flex-shrink: 0;
+            }
+
+            .admin-container {
+                display: flex;
+                flex-direction: column;
+                flex: 1;
+                overflow: hidden;
+                padding: 20px;
+                background: #f9fafb;
+            }
+
+            .admin-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 20px;
+                gap: 20px;
+            }
+
+            .admin-title {
+                color: #1A2C50;
+                font-size: 2rem;
+                font-weight: 800;
+                margin: 0;
+            }
+
+            .btn-add-movie {
+                text-decoration: none;
+                padding: 12px 28px;
+                border-radius: 8px;
+                background: linear-gradient(90deg, #1A2C50 0%, #2d4a7c 100%);
+                color: white;
+                font-weight: 600;
+                font-family: "Montserrat", sans-serif;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                box-shadow: 0 4px 12px rgba(26, 44, 80, 0.25);
+                flex-shrink: 0;
+                border: none;
+                display: inline-block;
+            }
+
+            .btn-add-movie:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 6px 20px rgba(26, 44, 80, 0.35);
+            }
+
+            .table-wrapper {
+                flex: 1;
+                overflow: auto;
+                border: 1px solid #e5e7eb;
+                border-radius: 8px;
+                background: white;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            }
+
+            .movie-table {
+                width: 100%;
+                border-collapse: collapse;
+                font-size: 0.95rem;
+                margin: 0px;
+            }
+
+            .movie-table thead {
+                position: sticky;
+                top: 0;
+                z-index: 10;
+                background: #1A2C50;
+            }
+
+            .movie-table th {
+                padding: 16px 12px;
+                text-align: left;
+                color: white;
+                font-weight: 700;
+                white-space: nowrap;
+                border-bottom: 2px solid #1A2C50;
+            }
+
+            .movie-table td {
+                padding: 14px 12px;
+                vertical-align: middle;
+            }
+
+            .movie-table tbody tr {
+                border-bottom: 1px solid #e5e7eb;
+            }
+
+            .movie-table tbody tr:hover {
+                background-color: #f3f4f6;
+                transition: background-color 0.15s ease;
+            }
+
+            .movie-table thead tr:hover {
+                background-color: #1A2C50 !important;
+            }
+
+            .movie-table tbody tr:last-child {
+                border-bottom: none;
+            }
+
+            .movie-image-cell {
+                width: 100px;
+                height: auto;
+            }
+
+            .movie-image-cell img {
+                width: 100%;
+                max-width: 100px;
+                height: auto;
+                border-radius: 4px;
+                display: block;
+                object-fit: cover;
+            }
+
+            .movie-title-cell {
+                font-weight: 600;
+                color: #1A2C50;
+                min-width: 150px;
+                max-width: 200px;
+                word-wrap: break-word;
+            }
+
+            .movie-synopsis-cell {
+                min-width: 250px;
+                max-width: 400px;
+                white-space: normal;
+                word-wrap: break-word;
+                line-height: 1.4;
+                color: #4b5563;
+            }
+
+            .movie-duration-cell {
+                min-width: 100px;
+                text-align: center;
+                white-space: nowrap;
+            }
+
+            .movie-trailer-cell {
+                min-width: 120px;
+            }
+
+            .btn-trailer {
+                padding: 8px 14px;
+                border-radius: 6px;
+                background-color: #10b981;
+                color: white;
+                text-decoration: none;
+                font-size: 0.88rem;
+                font-weight: 600;
+                font-family: "Montserrat", sans-serif;
+                cursor: pointer;
+                transition: all 0.2s ease;
+                border: none;
+                display: inline-block;
+                text-align: center;
+                box-shadow: 0 2px 6px rgba(16, 185, 129, 0.3);
+            }
+
+            .btn-trailer:hover {
+                background-color: #059669;
+                transform: translateY(-1px);
+                box-shadow: 0 4px 10px rgba(16, 185, 129, 0.4);
+            }
+
+            .actions-cell {
+                min-width: 180px;
+                display: flex;
+                gap: 8px;
+                flex-wrap: wrap;
+                align-items: center;
+                height: 100%;
+                border-bottom: none;
+            }
+
+            .btn-action-admin {
+                padding: 8px 14px;
+                border-radius: 6px;
+                text-decoration: none;
+                font-size: 0.88rem;
+                font-weight: 600;
+                font-family: "Montserrat", sans-serif;
+                cursor: pointer;
+                transition: all 0.2s ease;
+                border: none;
+                display: inline-block;
+                text-align: center;
+            }
+
+            .btn-edit-movie {
+                background-color: #3b82f6;
+                color: white;
+                box-shadow: 0 2px 6px rgba(59, 130, 246, 0.3);
+            }
+
+            .btn-edit-movie:hover {
+                background-color: #2563eb;
+                transform: translateY(-1px);
+                box-shadow: 0 4px 10px rgba(59, 130, 246, 0.4);
+            }
+
+            .btn-delete {
+                background-color: #ef4444;
+                color: white;
+                box-shadow: 0 2px 6px rgba(239, 68, 68, 0.3);
+            }
+
+            .btn-delete:hover {
+                background-color: #dc2626;
+                transform: translateY(-1px);
+                box-shadow: 0 4px 10px rgba(239, 68, 68, 0.4);
+            }
+
+            footer {
+                flex-shrink: 0;
+                padding: 20px;
+                text-align: center;
+                background: linear-gradient(90deg, #1A2C50 0%, #2d4a7c 100%);
+                border-top: 1px solid #e5e7eb;
+                color: white;
+                font-size: 0.9rem;
+            }
+
+            .empty-state {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                padding: 60px 20px;
+                color: #9ca3af;
+            }
+
+            .empty-state-icon {
+                font-size: 3rem;
+                margin-bottom: 16px;
+                opacity: 0.5;
+            }
+
+            @media (max-width: 768px) {
+                .admin-header {
+                    flex-direction: column;
+                    align-items: stretch;
+                }
+
+                .btn-add-movie {
+                    width: 100%;
+                }
+
+                .actions-cell {
+                    flex-direction: column;
+                    gap: 6px;
+                }
+
+                .btn-action-admin {
+                    width: 100%;
+                }
+
+                .movie-synopsis-cell {
+                    max-width: 250px;
+                }
+
+                .admin-title {
+                    font-size: 1.5rem;
+                }
+            }
+        </style>
     </head>
     <body>
         <header>
             <a th:href="@{/}" class="index_link"><img class="logo" th:src="@{/img/blackWolfHorizontal.png}" alt="logo"></a>
             <nav>
                 <ul class="nav_links">
-                    <li class="nav_item"><a href="upcomingfilms.html">Proximos estrenos</a></li>
-                    <li class="nav_item"><p class="userName">Hola <span sec:authentication="principal.username"></span></p></li>
+                    <li class="nav_item"><p class="userName">Bienvenido <span sec:authentication="principal.username"></span></p></li>
                     <li>
                         <form action="#" th:action="@{/logout}" method="POST">
-                            <input type="submit" value="Cerrar Sesion" class="cerrar-sesion"/>
+                            <input type="submit" value="Cerrar Sesión" class="cerrar-sesion"/>
                         </form>
                     </li>
                 </ul>
             </nav>
         </header>
-        <h1>Panel de peliculas</h1>
-        <style>
-            .btn-add-movie{
-                text-decoration: none;
-                padding: 10px 30px; 
-                border-radius: 10px; 
-                background-color: #1A2C50;
-            }
-            .movie-table{
-                border-spacing: 0;
-                border: 1px solid #1A2C50;
-            }
 
-            .movie-table td{
-                border: 1px solid #1A2C50;
-            }
+        <div class="admin-container">
+            <div class="admin-header" sec:authorize="hasRole('ADMIN')">
+                <h1 class="admin-title">Panel de Películas</h1>
+                <a class="btn-add-movie" th:href="@{/admin/movies/add-movie}">Añadir Película</a>
+            </div>
 
-            .movie-table th {
-                background-color: #1A2C50; 
-                color: white; 
-                border: 1px solid #1A2C50;
-            }
-            .btn-action-admin{
-                margin: 10px;
-            }
-            .btn-delete{
-                background-color: red;
-                padding: 10px;
-            }
-            .btn-edit-movie{
-                padding: 10px;
-                background-color: deepskyblue;
-            }
-        </style>
-        
-        
-        <!-- movie container-->
-        <div style="display: flex; flex-direction: column; justify-content: center; margin: 0 100px 100px;">
-            <div style="margin: 40px; display: flex; justify-content:right; " sec:authorize="hasRole('ADMIN')">
-                <ul>
-                    <li><a class="btn-add-movie" th:href="@{/admin/movies/add-movie}">Añadir Pelicula</a></li>
-                </ul>
-                  
-            </div> 
+            <div class="table-wrapper">
+                <table class="movie-table" th:if="${not #lists.isEmpty(movies)}">
+                    <thead>
+                        <tr>
+                            <th>Portada</th>
+                            <th>Título</th>
+                            <th>Sinopsis</th>
+                            <th>Duración</th>
+                            <th>Trailer</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="movie : ${movies}" th:object="${movie}">
+                            <td class="movie-image-cell">
+                                <img th:src="@{/assets/{filename}(filename=*{imagePath})}" th:alt="*{name}">
+                            </td>
+                            <td class="movie-title-cell" th:text="*{name}"></td>
+                            <td class="movie-synopsis-cell" th:text="*{synopsis}"></td>
+                            <td class="movie-duration-cell" th:text="*{duration} + ' min'"></td>
+                            <td class="movie-trailer-cell">
+                                <a class="btn-trailer" th:href="*{Trailer}" target="_blank" th:if="*{Trailer}">Ver Trailer</a>
+                                <span th:unless="*{Trailer}" style="color: #9ca3af;">Sin trailer</span>
+                            </td>
+                            <td class="actions-cell">
+                                <a class="btn-action-admin btn-edit-movie" th:href="@{/admin/movies/update-movie/{id}(id=*{id})}">Editar</a>
+                                <button class="btn-action-admin btn-delete" th:onclick="'deleteMovie(' + *{id} +')'">Eliminar</button>
+                                <form th:id="'deleteMovieForm' + *{id}" th:action="@{/admin/movies/delete-movie/{id}(id=*{id})}" method="POST" style="display: none;"></form>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
 
-            <table class="movie-table" >
-                <thead>
-                    <tr>
-                        <th>Portada</th>
-                        <th>Titulo</th>
-                        <th>Sinopsis</th>
-                        <th>Duración</th>
-                        <th>Trailer</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr th:each="movie : ${movies}" th:object="${movie}">
-                        <td>
-                            <img width="300px" th:src="@{/assets/{filename}(filename=*{imagePath})}" alt="" >
-                        </td>
-                        <td>
-                            <p th:text="*{name}"></p>
-                        </td>
-                        <td style="width: 400px;">
-                            <p th:text="*{synopsis}"></p>
-                        </td>
-                        <td>
-                            <p th:text="*{duration}"></p>
-                        </td>
-                        <td>
-                            <p th:text="*{Trailer}"></p>
-                        </td>
+                <div class="empty-state" th:if="${#lists.isEmpty(movies)}">
+                    <div class="empty-state-icon">🎬</div>
+                    <p>No hay películas registradas</p>
+                    <a class="btn-add-movie" th:href="@{/admin/movies/add-movie}" style="margin-top: 20px;">+ Añadir Primera Película</a>
+                </div>
+            </div>
+        </div>
 
-                        <td>
-                           <a class="btn-action-admin btn-edit-movie" th:href="@{/admin/movies/update-movie/{id}(id=*{id})}">Editar</a>
-                           <a class="btn-action-admin btn-delete"  th:onclick="'deleteMovie(' + *{id} +')'">Eliminar</a>
-                           <form th:id="'deleteMovieForm' + *{id}" th:action="@{/admin/movies/delete-movie/{id}(id=*{id})}" method="POST">
-                           </form>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-		</div>
-
-        <!--end movie container -->
         <footer>
-            <p>Black Wolf Cinema ®</p>
+            <p>© Black Wolf Cinema 2025 - Sistema de Gestión de Cines</p>
         </footer>
 
-
         <script>
-            function deleteMovie(id){
-
-        	    if(!confirm("¿Estás seguro de eliminar esta película?")){
-        		    return;
-        	    }
-        	    // get form by id
-                var form = document.getElementById('deleteMovieForm' + id);
-                // send form
-                form.submit();
+            function deleteMovie(id) {
+                if (!confirm("¿Estás seguro de que deseas eliminar esta película?")) {
+                    return;
+                }
+                const form = document.getElementById('deleteMovieForm' + id);
+                if (form) {
+                    form.submit();
+                }
             }
         </script>
-
     </body>
 </html>

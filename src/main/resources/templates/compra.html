@@ -303,6 +303,9 @@
         }
 
         .btn-print {
+            height: 43px;
+            text-wrap: nowrap;
+            width: auto;
             background: #f59e0b;
             color: white;
         }
@@ -458,11 +461,6 @@
                     <div id="qrcode"></div>
                 </div>
 
-                <!-- Información de Referencia -->
-                <div class="ticket-footer" style="margin-bottom: 30px; border-top: none; background: transparent; padding: 0;">
-                    <div class="ticket-reference" th:text="'Referencia: TICKET-' + ${ticket.ticketId}"></div>
-                </div>
-
                 <!-- Botones de Acción -->
                 <div class="ticket-actions">
                     <button class="ticket-btn btn-print" onclick="window.print()">
@@ -476,7 +474,6 @@
 
             <!-- Footer -->
             <div class="ticket-footer">
-                <div class="ticket-reference">Referencia: <span th:text="'TICKET-' + ${ticket.ticketId}"></span></div>
                 <p>Presenta este boleto en taquilla. Válido solo para la función indicada.</p>
             </div>
         </div>

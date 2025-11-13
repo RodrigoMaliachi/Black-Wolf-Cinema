@@ -1,75 +1,103 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
-    <title>Show Directory</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Bootstrap demo</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <title>Panel de Funciones - Black Wolf Cinema</title>
     <link rel="stylesheet" th:href="@{/css/style.css}">
+    <style>
+        * { box-sizing: border-box; }
+        body { margin: 0; font-family: "Montserrat", sans-serif; background: #f9fafb; }
+        header { padding: 18px 20px; background: linear-gradient(90deg, #1A2C50 0%, #2d4a7c 100%); border-bottom: 1px solid #e5e7eb; }
+        .page-container { max-width: 1200px; margin: 20px auto; padding: 0 16px; }
+        .shows-header { display:flex; justify-content:space-between; align-items:center; gap: 12px; margin-bottom: 16px; }
+        .page-title { font-size: 1.5rem; color: #1A2C50; font-weight: 800; margin:0; }
+        .btn-primary-azul { padding: 10px 18px; background: linear-gradient(90deg,#1A2C50 0%,#2d4a7c 100%); color: white; border-radius:8px; text-decoration:none; font-weight:600; box-shadow: 0 4px 12px rgba(26,44,80,0.12); }
+        .btn-primary-azul:hover { transform: translateY(-2px); }
 
+        .table-panel { background: white; border-radius: 8px; padding: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); overflow: hidden; }
+        .table-wrapper { overflow:auto; max-height: 60vh; }
+
+        table.shows-table { width: 100%; border-collapse: collapse; min-width: 700px; }
+        table.shows-table thead { background: #1A2C50; color: white; position: sticky; top: 0; z-index: 5; }
+        table.shows-table th, table.shows-table td { padding: 12px 10px; text-align: left; vertical-align: middle; }
+        table.shows-table thead tr:hover { background-color: #1A2C50 !important; }
+        table.shows-table tbody tr { border-bottom: 1px solid #e5e7eb; }
+        table.shows-table tbody tr:hover { background: #f3f4f6; }
+
+        .action-buttons { display:flex; gap:8px; align-items:center; }
+        .btn-action { padding:8px 12px; border-radius:6px; text-decoration:none; color:white; font-weight:600; }
+        .btn-update { background:#3b82f6; }
+        .btn-delete { background:#ef4444; }
+
+        @media (max-width: 768px) {
+            .shows-header { flex-direction: column; align-items:stretch; }
+            .btn-primary-azul { width:100%; text-align:center; }
+            table.shows-table { min-width: 600px; }
+        }
+    </style>
 </head>
 <body>
-
     <header>
         <a th:href="@{/}" class="index_link"><img class="logo" th:src="@{/img/blackWolfHorizontal.png}" alt="logo"></a>
-       
-        <nav>
-            <ul class="nav_links">
-                <li><a th:href="@{/}"></a></li>
-                <li class="nav_item"><p class="userName">Hola <span sec:authentication="principal.username"></span></p></li>
-                <li> 
-                    <form action="#" th:action="@{/logout}" method="POST">
-                        <input type="submit" value="Cerrar Sesion" class="cerrar-sesion"/>
-                    </form>
-                </li>
-            </ul>
-        </nav>
     </header>
 
-    <h3 style="margin-top: 10px;" >Panel de Funciones</h3>
-    <hr>
-    <!-- Button -->
-    <a th:href="@{/admin/shows/add-show}" class="btn btn-primary btn-sm mb-3 bg-azul">
-        Agregar Función
-    </a>
-    <a th:href="@{/}" class="btn btn-primary btn-sm mb-3 bg-azul">Regresar a la cartelera</a>
-    <div class="container">
-        <table class="table table-bordered table-scripted">
-            <thead class="table-dark">
-            <tr>
-                <th id="th-azul">Nombre de la película</th>
-                <th id="th-azul">Fecha de la función</th>
-                <th id="th-azul">Hora de la función</th>
-                <th id="th-azul">Sala de cine</th>
-                <th id="th-azul">Acción</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr th:each="tempShow: ${shows}">
-                <td th:text="${tempShow.movie.name}"/>
-                <td th:text="${tempShow.showDate}"/>
-                <td th:text="${tempShow.showHour}"/>
-                <td th:text="${tempShow.cinemaRoom.cinemaRoomId}"/>
-                <td>
-                    <a th:href="@{/admin/shows/update-show(showId=${tempShow.showId})}"
-                    class="btn btn-info btn-sm bg-azul fg-blanco">
-                    Actualizar
-                    </a>
+    <div class="page-container">
+        <div class="shows-header">
+            <h2 class="page-title">Panel de Funciones</h2>
+            <div>
+                <a th:href="@{/admin/shows/add-show}" class="btn-primary-azul">Agregar Función</a>
+                <a th:href="@{/}" class="btn-primary-azul" style="margin-left:8px; background: #6b7280;">Regresar</a>
+            </div>
+        </div>
 
-                    <a th:href="@{/admin/shows/delete(showId=${tempShow.showId})}"
-                    class="btn btn-danger btn-sm bg-rojo"
-                    onclick="if (!(confirm('Seguro que quieres eliminar el show?'))) return false">
-                    Eliminar
-                    </a>
-                </td>
-            </tr>
-            </tbody>
-        </table>
+        <div class="table-panel">
+            <div class="table-wrapper">
+                <table class="shows-table" th:if="${not #lists.isEmpty(shows)}">
+                    <thead>
+                        <tr>
+                            <th>Película</th>
+                            <th>Fecha</th>
+                            <th>Hora</th>
+                            <th>Sala</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="tempShow : ${shows}">
+                            <td th:text="${tempShow.movie.name}"></td>
+                            <td th:text="${tempShow.showDate}"></td>
+                            <td th:text="${tempShow.showHour}"></td>
+                            <td th:text="${tempShow.cinemaRoom.cinemaRoomId}"></td>
+                            <td>
+                                <div class="action-buttons">
+                                    <a th:href="@{/admin/shows/update-show(showId=${tempShow.showId})}" class="btn-action btn-update">Actualizar</a>
+                                    <a th:href="@{/admin/shows/delete(showId=${tempShow.showId})}" class="btn-action btn-delete" th:onclick="|if(!(confirm('¿Seguro que quieres eliminar el show?'))) return false;|">Eliminar</a>
+                                </div>
+                                <form th:id="'deleteShowForm' + ${tempShow.showId}" th:action="@{/admin/shows/delete(showId=${tempShow.showId})}" method="POST" style="display:none"></form>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="empty-state" th:if="${#lists.isEmpty(shows)}" style="padding:24px; text-align:center;">
+                    <p style="color:#6b7280; font-size:1rem; margin:0 0 12px 0;">No hay funciones registradas.</p>
+                    <a th:href="@{/admin/shows/add-show}" class="btn-primary-azul">+ Agregar Función</a>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <footer>
+    <footer style="padding:18px 0; text-align:center; color:white;">
         <p>Black Wolf Cinema ®</p>
     </footer>
+
+    <script>
+        /* optional: handle delete via form submit to avoid direct GET delete links */
+        function submitDelete(formId) {
+            const f = document.getElementById(formId);
+            if (f) f.submit();
+        }
+    </script>
 </body>
 </html>

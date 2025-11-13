@@ -1,58 +1,397 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
-    <link rel="stylesheet" th:href="@{/css/addmovie.css}">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Editar Película - Black Wolf Cinema</title>
     <link rel="stylesheet" th:href="@{/css/style.css}">
-    
+    <style>
+        * { box-sizing: border-box; }
+
+        .movie-form-container {
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            max-width: 700px;
+            margin: 40px auto;
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .movie-form-title {
+            color: #1A2C50;
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #1A2C50;
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            font-family: "Montserrat", sans-serif;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            box-sizing: border-box;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #1A2C50;
+            box-shadow: 0 0 0 3px rgba(26, 44, 80, 0.1);
+        }
+
+        .form-group input:invalid {
+            border-color: #ef4444;
+        }
+
+        .form-group input.error,
+        .form-group textarea.error {
+            border-color: #ef4444;
+            background-color: #fef2f2;
+        }
+
+        .error-list {
+            list-style: none;
+            padding: 0;
+            margin: 8px 0 15px 0;
+        }
+
+        .error-list li {
+            background-color: #fef2f2;
+            color: #991b1b;
+            padding: 10px 12px;
+            border-radius: 6px;
+            border-left: 4px solid #ef4444;
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+        }
+
+        .form-buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 30px;
+            justify-content: center;
+            flex-wrap: nowrap;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-family: "Montserrat", sans-serif;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            border: none;
+            font-size: 0.95rem;
+            white-space: nowrap;
+        }
+
+        .btn-primary {
+            height: 43px;
+            background: linear-gradient(90deg, #1A2C50 0%, #2d4a7c 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(26, 44, 80, 0.25);
+            width: auto;
+            padding: 0px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(26, 44, 80, 0.35);
+        }
+
+        .btn-primary:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            height: 43px;
+            background: #6b7280;
+            color: white;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-secondary:hover {
+            background: #4b5563;
+            transform: translateY(-2px);
+        }
+
+        .required::after {
+            content: " *";
+            color: #ef4444;
+            font-weight: 700;
+        }
+
+        .alert {
+            background-color: #fef2f2;
+            border: 1px solid #fca5a5;
+            color: #991b1b;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .alert.show {
+            display: block;
+        }
+
+        .file-input-wrapper {
+            position: relative;
+            display: inline-block;
+            width: 100%;
+        }
+
+        .file-input-wrapper input[type="file"] {
+            display: none;
+        }
+
+        .file-input-label {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            border: 2px dashed #1A2C50;
+            border-radius: 6px;
+            background-color: #f9fafb;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            color: #1A2C50;
+        }
+
+        .file-input-label:hover {
+            background-color: #f0f4f9;
+            border-color: #2d4a7c;
+        }
+
+        .file-name {
+            margin-top: 8px;
+            font-size: 0.9rem;
+            color: #4b5563;
+        }
+
+        @media (max-width: 480px) {
+            .form-buttons { flex-direction: column; align-items: stretch; }
+            .btn { width: 100%; }
+            .btn-primary, .btn-secondary { height: auto; padding: 12px 24px; }
+            .movie-form-container { padding: 24px; margin: 20px 10px; }
+        }
+    </style>
 </head>
 <body>
     <header>
-        <a th:href="@{/}" class="index_link"><img class="logo" th:src="@{/img/blackWolfHorizontal.png}" alt="logo"></a>
-       
+        <a th:href="@{/}" class="index_link"><img class="logo" th:src="@{/img/blackWolfHorizontal.png}" alt="Black Wolf Cinema Logo"></a>
         <nav>
             <ul class="nav_links">
-                <li><a th:href="@{/}"></a></li>
-                <li class="nav_item"><p class="userName">Hola <span sec:authentication="principal.username"></span></p></li>
-                <li> 
+                <li class="nav_item"><p class="userName">Bienvenido <span sec:authentication="principal.username"></span></p></li>
+                <li>
                     <form action="#" th:action="@{/logout}" method="POST">
-                        <input type="submit" value="Cerrar Sesion" class="cerrar-sesion"/>
+                        <input type="submit" value="Cerrar Sesión" class="cerrar-sesion"/>
                     </form>
                 </li>
             </ul>
         </nav>
     </header>
-    <div class="container">
-        <form action="#" th:action="@{/admin/movies/update-movie/{id}(id=*{id})}" class="form-movie" method="POST" th:object="${movie}" enctype="multipart/form-data" >
-        <div>
-            <label for="name">Titulo : </label> 
-            <input type="text" id="name" placeholder="Escriba el titulo" th:field="*{name}">
-        </div>
 
-        <div >
-            <label for="synopsis" class="form-label">Sinopsis : </label>
-            <textarea id="synopsis" placeholder="Escriba la sinopsis" th:field="*{synopsis}"></textarea>
-        </div>
-        <div >
-            <label for="time" class="form-label">Duración : </label>
-            <input type="number" id="time" placeholder="Escriba la duración" th:field="*{duration}"></input>
-        </div>
-        <div>
-            <label for="trailer">Trailer : </label> 
-            <input type="text" id="trailer" placeholder="Digite el trailer" th:field="*{trailer}">
-        </div>
-        <div>
-            <label for="portada">Portada : </label> 
-            <input type="file" name="portada" id="portada" th:field="*{portada}">
-        </div>
-        <button type="submit" class="btn btn-primary">Guardar</button>
+    <div class="movie-form-container">
+        <h1 class="movie-form-title">Editar Película</h1>
 
-    
-    </form>
+        <div id="alertBox" class="alert"></div>
+
+        <form action="#" th:action="@{/admin/movies/update-movie/{id}(id=*{id})}" method="POST" th:object="${movie}" enctype="multipart/form-data" novalidate id="movieForm">
+            
+            <!-- Título -->
+            <div class="form-group">
+                <label for="name" class="required">Título</label>
+                <input type="text" id="name" placeholder="Ingresa el título de la película" th:field="*{name}" th:classappend="${#fields.hasErrors('name') ? 'error' : ''}" required>
+                <ul class="error-list" th:if="${#fields.hasErrors('name')}">
+                    <li th:each="err : ${#fields.errors('name')}" th:text="${err}"></li>
+                </ul>
+            </div>
+
+            <!-- Sinopsis -->
+            <div class="form-group">
+                <label for="synopsis" class="required">Sinopsis</label>
+                <textarea id="synopsis" placeholder="Escribe una descripción de la película" th:field="*{synopsis}" th:classappend="${#fields.hasErrors('synopsis') ? 'error' : ''}" required></textarea>
+                <ul class="error-list" th:if="${#fields.hasErrors('synopsis')}">
+                    <li th:each="err : ${#fields.errors('synopsis')}" th:text="${err}"></li>
+                </ul>
+            </div>
+
+            <!-- Duración -->
+            <div class="form-group">
+                <label for="duration" class="required">Duración (minutos)</label>
+                <input type="number" id="duration" placeholder="Ejemplo: 120" th:field="*{duration}" th:classappend="${#fields.hasErrors('duration') ? 'error' : ''}" required>
+                <ul class="error-list" th:if="${#fields.hasErrors('duration')}">
+                    <li th:each="err : ${#fields.errors('duration')}" th:text="${err}"></li>
+                </ul>
+            </div>
+
+            <!-- Trailer URL -->
+            <div class="form-group">
+                <label for="trailer" class="required">URL del Trailer</label>
+                <input type="url" id="trailer" placeholder="Ejemplo: https://youtube.com/watch?v=..." th:field="*{trailer}" th:classappend="${#fields.hasErrors('trailer') ? 'error' : ''}" required>
+                <ul class="error-list" th:if="${#fields.hasErrors('trailer')}">
+                    <li th:each="err : ${#fields.errors('trailer')}" th:text="${err}"></li>
+                </ul>
+            </div>
+
+            <!-- Portada -->
+            <div class="form-group">
+                <label class="required">Portada (Imagen)</label>
+                <div class="file-input-wrapper">
+                    <input type="file" id="portada" name="portada" accept="image/*" th:field="*{portada}">
+                    <label for="portada" class="file-input-label" id="fileLabel">Arrastra tu imagen aquí o haz clic para seleccionar</label>
+                    <div class="file-name" id="fileName"></div>
+                </div>
+                <ul class="error-list" th:if="${#fields.hasErrors('portada')}">
+                    <li th:each="err : ${#fields.errors('portada')}" th:text="${err}"></li>
+                </ul>
+            </div>
+
+            <div class="form-buttons">
+                <a class="btn btn-secondary" th:href="@{/admin/listMovies}">Regresar</a>
+                <button type="submit" class="btn btn-primary" id="submitBtn">Guardar Cambios</button>
+            </div>
+        </form>
     </div>
+
     <footer>
-        <p class="footer_text">Black Wolf Cinema ®</p>
+        <p class="footer_text">© Black Wolf Cinema 2025 - Sistema de Gestión de Cines</p>
     </footer>
 
+    <script>
+        const form = document.getElementById('movieForm');
+        const nameInput = document.getElementById('name');
+        const synopsisInput = document.getElementById('synopsis');
+        const durationInput = document.getElementById('duration');
+        const trailerInput = document.getElementById('trailer');
+        const portadaInput = document.getElementById('portada');
+        const alertBox = document.getElementById('alertBox');
+        const fileLabel = document.getElementById('fileLabel');
+        const fileName = document.getElementById('fileName');
+        const submitBtn = document.getElementById('submitBtn');
 
+        // File input handling
+        if (portadaInput) {
+            portadaInput.addEventListener('change', function() {
+                if (this.files && this.files.length > 0) {
+                    fileName.textContent = this.files[0].name;
+                    fileLabel.textContent = 'Imagen seleccionada';
+                }
+            });
+
+            // Drag and drop
+            fileLabel.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                fileLabel.style.backgroundColor = '#e8f0fe';
+                fileLabel.style.borderColor = '#1A2C50';
+            });
+
+            fileLabel.addEventListener('dragleave', () => {
+                fileLabel.style.backgroundColor = '#f9fafb';
+                fileLabel.style.borderColor = '#1A2C50';
+            });
+
+            fileLabel.addEventListener('drop', (e) => {
+                e.preventDefault();
+                fileLabel.style.backgroundColor = '#f9fafb';
+                if (e.dataTransfer.files.length > 0) {
+                    portadaInput.files = e.dataTransfer.files;
+                    const event = new Event('change', { bubbles: true });
+                    portadaInput.dispatchEvent(event);
+                }
+            });
+        }
+
+        // Form validation
+        form.addEventListener('submit', function(e) {
+            const name = nameInput.value.trim();
+            const synopsis = synopsisInput.value.trim();
+            const duration = durationInput.value;
+            const trailer = trailerInput.value.trim();
+
+            let errors = [];
+
+            if (!name) {
+                errors.push('El título no puede estar vacío');
+                nameInput.classList.add('error');
+            } else {
+                nameInput.classList.remove('error');
+            }
+
+            if (!synopsis) {
+                errors.push('La sinopsis no puede estar vacía');
+                synopsisInput.classList.add('error');
+            } else {
+                synopsisInput.classList.remove('error');
+            }
+
+            if (!duration || duration <= 0) {
+                errors.push('La duración debe ser mayor a 0 minutos');
+                durationInput.classList.add('error');
+            } else {
+                durationInput.classList.remove('error');
+            }
+
+            if (!trailer) {
+                errors.push('La URL del trailer no puede estar vacía');
+                trailerInput.classList.add('error');
+            } else {
+                trailerInput.classList.remove('error');
+            }
+
+            if (errors.length > 0) {
+                e.preventDefault();
+                showError(errors.join('\n'));
+            }
+        });
+
+        function showError(message) {
+            alertBox.textContent = 'Error: ' + message;
+            alertBox.classList.add('show');
+        }
+
+        function clearError() {
+            alertBox.textContent = '';
+            alertBox.classList.remove('show');
+        }
+    </script>
 </body>
 </html>
